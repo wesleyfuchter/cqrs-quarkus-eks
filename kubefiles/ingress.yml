@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: bankaccount-ingress
+  namespace: quarkus-cqrs-demo
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+  labels:
+    app: bankaccount-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /transaction-service/*
+            backend:
+              serviceName: transaction-service
+              servicePort: 8080
+          - path: /balance-service/*
+            backend:
+              serviceName: balance-service
+              servicePort: 8080    

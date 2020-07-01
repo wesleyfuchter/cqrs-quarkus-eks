@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: balance-service
+  namespace: quarkus-cqrs-demo
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  type: NodePort
+  selector:
+    app: balance-app
+    namespace: quarkus-cqrs-demo
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balance-app
+  namespace: quarkus-cqrs-demo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: balance-app
+      namespace: quarkus-cqrs-demo
+  template:
+    metadata:
+      labels:
+        app: balance-app
+        namespace: quarkus-cqrs-demo
+    spec:
+      containers:
+        - name: balance-app
+          image: moduscreate/quarkus-balance-service:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /balance-service/health/live
+          readinessProbe:
+            httpGet:
+              path: /balance-service/health/ready
+              port: 8080
